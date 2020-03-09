@@ -1,0 +1,20 @@
+{
+  "name": "golike-electron",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "set NODE_ENV=dev&&electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^8.1.0"
+  },
+  "dependencies": {
+    "electron-json-storage": "^4.1.8",
+    "socket.io-client": "^2.3.0"
+  }
+}
