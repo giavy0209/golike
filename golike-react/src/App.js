@@ -6,7 +6,8 @@ import Login from './components/Login'
 import GolikeAccount from './components/GolikeAccount'
 import Loading from './components/Loading'
 import Footer from './components/Footer'
-import Autorun from './components/Autorun';
+import Account from './components/Account';
+import EarnMoney from './components/EarnMoney';
 
 const electron = window.require('electron')
 const {ipcRenderer} = electron;
@@ -25,6 +26,7 @@ function App() {
   const [Username, setUsername] = useState('')
   const [Password, setPassword] = useState('')
   const [FooterTab, setFooterTab] = useState('login')
+  const [GlobalListAccoutHas, setGlobalListAccoutHas] = useState([])
 
   const loginSuccess = useCallback(({userGolike,passGolike, shortID, username,password})=>{
     setUserGolike(userGolike)
@@ -37,6 +39,7 @@ function App() {
 
   const changeTab = useCallback((tabName)=>{
     setFooterTab(tabName)
+    console.log(tabName)
   },[])
   return (
     <>
@@ -47,6 +50,7 @@ function App() {
       ipcRenderer={ipcRenderer}
       loginSuccess={loginSuccess}
       setDisplayLoading={setDisplayLoading}
+      setGlobalListAccoutHas={setGlobalListAccoutHas}
       />
       <GolikeAccount
       className={FooterTab==='account'? 'dp-b' : 'dp-n'}
@@ -58,8 +62,16 @@ function App() {
       Password={Password}
       socket={socket}
       />
-      <Autorun
-      className={FooterTab==='autorun'? 'dp-b' : 'dp-n'}
+      <Account
+      className={FooterTab==='account-manager'? 'dp-b' : 'dp-n'}
+      ipcRenderer={ipcRenderer}
+      UserGolike={UserGolike}
+      PassGolike={PassGolike}
+      setGlobalListAccoutHas={setGlobalListAccoutHas}
+      />
+      <EarnMoney
+      className={FooterTab==='earnmoney'? 'dp-b' : 'dp-n'}
+      GlobalListAccoutHas={GlobalListAccoutHas}
       ipcRenderer={ipcRenderer}
       UserGolike={UserGolike}
       PassGolike={PassGolike}

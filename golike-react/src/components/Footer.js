@@ -14,8 +14,11 @@ export default function Footer({FooterTab,changeTab,className}){
                 <i className="fas fa-home"></i>
                 <p>TK Golike</p>
             </div>
-            <div onClick={()=>{changeTab('autorun')}} className={checkActive('autorun')}>
-                <i className="fas fa-dollar-sign"></i>
+            <div onClick={()=>{changeTab('account-manager')}} className={checkActive('account-manager')}>
+                <i class="fas fa-user-circle"></i>
+                <p>Quản lý tài khoản</p>
+            </div><div onClick={()=>{changeTab('earnmoney')}} className={checkActive('earnmoney')}>
+                <i class="fas fa-dollar-sign"></i>
                 <p>Kiếm tiền nào</p>
             </div>
         </footer>

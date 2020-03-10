@@ -497,4 +497,19 @@ footer .active {
   .list-account .name span {
     width: calc(100% - 100px); }
 
+.list-account-added {
+  margin-top: 30px; }
+  .list-account-added .account-added {
+    padding: 10px;
+    box-shadow: 0 0 15px 0 rgba(255, 255, 255, 0.5); }
+    .list-account-added .account-added img {
+      width: 50px;
+      vertical-align: top; }
+    .list-account-added .account-added > span {
+      width: calc(100% - 100px);
+      font-size: 14px;
+      vertical-align: top; }
+    .list-account-added .account-added + .account-added {
+      margin-top: 20px; }
+
 /*# sourceMappingURL=App.css.map */

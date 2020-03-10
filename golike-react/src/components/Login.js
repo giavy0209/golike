@@ -1,7 +1,7 @@
 import React,{useEffect,useState,useCallback} from 'react';
 
 export default function(props){
-    let {setDisplayLoading,socket,loginSuccess,ipcRenderer,className} = props
+    let {setDisplayLoading,socket,loginSuccess,ipcRenderer,className,setGlobalListAccoutHas} = props
     const [Alert,setAlert] = useState('')
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -44,13 +44,14 @@ export default function(props){
 
         ipcRenderer.send('req-userInfo')
 
-        ipcRenderer.on('res-userInfo',(event,data)=>{
+        ipcRenderer.on('res-userInfo',(event,{data,listAccount})=>{
             if(data.username && data.password){
                 setDisplayLoading(0.8)
                 socket.emit('client-login',data)
+                setGlobalListAccoutHas([...listAccount])
             }
         })
-    },[ipcRenderer,setDisplayLoading,socket,loginSuccess])
+    },[ipcRenderer,setDisplayLoading,socket,loginSuccess,setGlobalListAccoutHas])
     return(
         <div className={className}>
         <p>Đăng nhập hoặc đăng ký nếu chưa có tài khoản</p>
