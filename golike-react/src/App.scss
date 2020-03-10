@@ -57,12 +57,14 @@ body {
     color: #e7e7e7;
     background-color: #454545;
     font-weight: 400;
-    height:  3000px;    
+    height:  3000px;
+    overflow-x: hidden;
 }
 
 .pp-container {
     width: 100vw;
     margin: 0 auto;
+    padding: 10px;
 }
 /*=========== 00. General ================ */
 .img {
@@ -433,4 +435,99 @@ body {
 .plr-0{
     padding-left: 0 !important;
     padding-right: 0 !important;
+}
+
+.webview{
+    width: 100vw;
+    height: 50vh;
+}
+
+input{
+    width: 100%;
+    padding: 5px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+button{
+    width: 25%;
+    padding: 5px;
+    border-radius: 5px;
+    display: block;
+    margin: 0 auto;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+
+.mask-loading{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #000;
+    z-index: 99;
+    display: block;
+    opacity: 0.5;
+    pointer-events: all;
+}
+.mask-loading.off{
+    pointer-events: none;
+    display: none;
+}
+.mask-loading img{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 999999999999;
+    pointer-events: none;
+    width: 50px;
+    height: 50px;
+}
+footer{
+    position: fixed;
+    bottom: 0;
+    font-size: 0;
+    width: 100%;
+    border-top: 1px solid #000;
+    background-color: #333;
+    width: 100vw;
+}
+
+footer > * {
+    display: inline-block;
+    font-size: 14px;
+    width: 33.3333%;
+    text-align: center;
+    padding: 5px 0;
+    cursor: pointer;
+    color: #ffffff;
+    font-size: 18px;
+}
+footer .active{
+    background-color: #777;
+}
+
+.dp-b{
+    display: block;
+}
+
+.dp-n{
+    display: none;
+}
+
+.list-account{
+    .list-account-img{
+        width: 50px;
+        vertical-align: top;
+    }
+    .name{
+        span{
+            width: calc(100% - 100px);
+        }
+    }
+    margin-top: 50px;
+    box-shadow: 0 0 15px 0 rgba(255, 255, 255, 0.5);
+    padding: 5px;
 }
