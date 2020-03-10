@@ -170,6 +170,29 @@ async function createAutoRunWindow(username,password,accountid){
             })
         `)
         await waitFor(15000)
+            var listPrice = document.querySelectorAll('.hold-prices');
+            var maxPrice = Number(listPrice[0].innerText)
+            var maxPriceEl = listPrice[0]
+            listPrice.forEach(el=>{
+                if(Number(el.innerText) > maxPrice) {
+                    maxPrice = Number(el.innerText)
+                    maxPriceEl=el
+                }
+            })
+        await autoRunWindow.webContents.executeJavaScript(`
+            var listPrice = document.querySelectorAll('.hold-prices');
+            var maxPrice = Number(listPrice[0].innerText)
+            var maxPriceEl = listPrice[0]
+            listPrice.forEach(el=>{
+                if(Number(el.innerText) > maxPrice) {
+                    maxPrice = Number(el.innerText)
+                    maxPriceEl=el
+                }
+            })
+            maxPriceEl.click()
+        `)
+
+        await waitFor(20000)
     }else{
         mainWindow.webContents.send('wrong-account')
         autoRunWindow.close()
