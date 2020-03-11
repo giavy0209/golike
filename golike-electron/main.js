@@ -141,7 +141,6 @@ async function createCheckFBWindow(AccountFB,PasswordFB,AccountFBID){
         var index =  oldData.findIndex(o=> o.id === AccountFBID)
         if(index !== -1){
             oldData.splice(index, 1)
-            oldData.push(obj)
         }
         oldData.push(obj)
 
