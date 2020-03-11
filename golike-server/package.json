@@ -13,8 +13,6 @@
   "dependencies": {
     "express": "^4.17.1",
     "mongoose": "^5.9.3",
-    "puppeteer": "^2.1.1",
-    "shortid": "^2.2.15",
     "socket.io": "^2.3.0"
   }
 }

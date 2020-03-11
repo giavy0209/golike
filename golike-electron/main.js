@@ -12,6 +12,11 @@ async function loopJob( callback) {
     }
 }
 
+function randomTime(){
+    var time = (Math.random()*30 + 30)*1000
+    return time
+}
+
 //=================Electron path=========================
 const {BrowserWindow, Menu, ipcMain, app} = require('electron');
 
@@ -104,7 +109,7 @@ async function createSubWindow(username, password){
     }
 }
 
-async function createCheckFBWindow(AccountFB,PasswordFB,AccountFBID){
+async function createCheckFBWindow(AccountFB,PasswordFB,AccountFBID,UserGolike){
     checkFBWindow = new BrowserWindow({
         width: 800,
         height: 20000,
@@ -131,11 +136,13 @@ async function createCheckFBWindow(AccountFB,PasswordFB,AccountFBID){
     `)
     
     if(isLoged){
+        console.log(isLoged)
         var oldData = JSON.parse(fs.readFileSync(path.join(__dirname,'./account.json')))
         var obj = {
             username:AccountFB,
             password:PasswordFB,
             id: AccountFBID,
+            owner:UserGolike,
         }
 
         var index =  oldData.findIndex(o=> o.id === AccountFBID)
@@ -145,6 +152,8 @@ async function createCheckFBWindow(AccountFB,PasswordFB,AccountFBID){
         oldData.push(obj)
 
         let newData = JSON.stringify(oldData, null, 2);
+
+        socket.emit('add-accoung-fb',obj)
 
         fs.writeFileSync(path.join(__dirname,'./account.json'), newData)
         mainWindow.webContents.send('loged-fb', oldData);
@@ -170,18 +179,18 @@ async function createAutoRunWindow(username,password,accountid){
         await autoRunWindow.webContents.executeJavaScript(`document.querySelector('form input[type="password"]').focus()`)
         await autoRunWindow.webContents.insertText(password)
         await autoRunWindow.webContents.executeJavaScript(`document.querySelector('form button[type="submit"]').click()`)
-        await waitFor(5000)
+        await waitFor(randomTime())
         var currentURL = autoRunWindow.webContents.getURL()
         if(currentURL === 'https://app.golike.net/home'){
             await autoRunWindow.webContents.loadURL('https://app.golike.net/jobs/facebook')
-    
+            await waitFor(randomTime())
+
             await autoRunWindow.webContents.executeJavaScript(`
             document.querySelectorAll('.col-auto.pl-0.pr-2').forEach(el=>{
                 el.click()
             })
             `)
-    
-            await waitFor(5000)
+            await waitFor(randomTime())
     
             await autoRunWindow.webContents.executeJavaScript(`
                 document.querySelectorAll('.card.shadow-200.mt-1 img').forEach(el=>{
@@ -192,28 +201,46 @@ async function createAutoRunWindow(username,password,accountid){
             //start loop job
             
             for (let index = 0; index < 1; index--) {
-                await waitFor(15000);
+                await waitFor(randomTime());
+                await autoRunWindow.webContents.executeJavaScript(`
+                    document.querySelectorAll('.material-icons.bg-gradient-1').forEach(el=>{if(el.innerText == 'refresh'){el.click()}})
+                `)
+                await waitFor(randomTime())
                 var listPrice = await autoRunWindow.webContents.executeJavaScript(`
                     function getPrice(){
-                        var listPrice = Array.from(document.querySelectorAll('.hold-prices'));
-                        if(listPrice && listPrice.length){
-                            var maxPrice = Number(listPrice[0].innerText)
-                            var maxPriceEl = listPrice[0]
-                            listPrice.forEach(el=>{
-                                if(Number(el.innerText) > maxPrice) {
-                                    maxPrice = Number(el.innerText)
-                                    maxPriceEl=el
-                                }
+                        var like  = document.querySelectorAll('.card.mb-2 .card-body img[src="../../assets/images/icons-gif/like.gif"]');
+                        var follow = document.querySelectorAll('.card.mb-2 .card-body img[src="../../assets/images/icons-gif/follow.svg"]');
+
+                        if(like.length > 0 || follow.length > 0){
+                            var listAvaiablePrice = [];
+                            like.forEach(el=>{
+                                el.nextElementSibling.firstChild.firstChild
+                                listAvaiablePrice.push(el.nextElementSibling.firstChild.firstChild)
                             })
-                            maxPriceEl.click()
+                            follow.forEach(el=>{
+                                el.nextElementSibling.firstChild.firstChild
+                                listAvaiablePrice.push(el.nextElementSibling.firstChild.firstChild)
+                            })
+
+                            var high = Number(listAvaiablePrice[0].innerText);
+                            var html = listAvaiablePrice[0]
+                            listAvaiablePrice.forEach(el=>{
+                                if(Number(el.innerText > high)){
+                                    high = Number(el.innerText);
+                                    html = el
+                                }
+
+                            })
+                            html.click()
+                            return true
+                        }else{
+                            return false
                         }
-                        return listPrice
                     }
                     getPrice()
                 `)
                 
-                if(listPrice && listPrice.length){
-                    console.log(listPrice)
+                if(listPrice){
                     await waitFor(20000)
                     //======================prevent open _blank and return value=================
                     var link = await autoRunWindow.webContents.executeJavaScript(`
@@ -231,7 +258,7 @@ async function createAutoRunWindow(username,password,accountid){
                     `)
                     if(link){
                         facebookJobWindow.loadURL(link)
-                        await waitFor(15000)
+                        await waitFor(randomTime())
                         await facebookJobWindow.webContents.executeJavaScript(`
                         document.querySelectorAll('a[role="button"]').forEach(el=>{
                             if(el.innerText ==='Thích') el.click()
@@ -248,14 +275,11 @@ async function createAutoRunWindow(username,password,accountid){
                         })
                         `)
     
-                        await waitFor(15000)
-    
-                        await waitFor(5000)
+                        await waitFor(randomTime())
                         await autoRunWindow.webContents.executeJavaScript(`document.querySelectorAll('h6.font-bold').forEach(el=> el.innerText === 'Hoàn thành' && el.click())`)
-                        await waitFor(5000)
+                        await waitFor(randomTime())
                         var isSuccess = await autoRunWindow.webContents.executeJavaScript(`
                             function checkStatus(){
-                                var status = document.getElementById('swal2-title').innerText
                                 if( document.getElementById('swal2-title')){
                                     var status = document.getElementById('swal2-title').innerText
                                     if(status ==='Thành công') return true
@@ -328,8 +352,8 @@ ipcMain.on('open-golike',(e,{username, password,shortID})=>{
   createSubWindow(username,password,shortID)      
 })
 
-ipcMain.on('check-login-fb',(e,{AccountFB,PasswordFB,AccountFBID})=>{
-    createCheckFBWindow(AccountFB,PasswordFB,AccountFBID)
+ipcMain.on('check-login-fb',(e,{AccountFB,PasswordFB,AccountFBID,UserGolike})=>{
+    createCheckFBWindow(AccountFB,PasswordFB,AccountFBID,UserGolike)
 })
 
 ipcMain.on('start-autorun',async (e,{UserGolike,PassGolike})=>{

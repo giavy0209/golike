@@ -33,9 +33,9 @@ export default function Autorun({className,ipcRenderer,UserGolike,PassGolike,set
         })
     },[ipcRenderer,setGlobalListAccoutHas])
 
-    const checkLoginFB = useCallback((id)=>{
-        ipcRenderer.send('check-login-fb',{AccountFB,PasswordFB,AccountFBID})
-    },[AccountFB,PasswordFB,AccountFBID,ipcRenderer])
+    const checkLoginFB = useCallback(()=>{
+        ipcRenderer.send('check-login-fb',{AccountFB,PasswordFB,AccountFBID,UserGolike})
+    },[AccountFB,PasswordFB,AccountFBID,ipcRenderer,UserGolike])
     return(
         <div className={className}>
             <div className={IsCheckGolike ? 'dp-n' : 'dp-b'}>

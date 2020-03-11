@@ -2,7 +2,6 @@ const express= require('express');
 const app = express();
 const port = 3001;
 const server = require("http").Server(app);
-const shortid = require('shortid');
 app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -15,10 +14,20 @@ const userSchema = new mongoose.Schema({
     password:String,
     userGolike: String,
     passGolike:String,
-    shortID:String
 });
 
 const userInfos = mongoose.model('userInfos', userSchema);
+
+const fbAccountSchema = new mongoose.Schema({
+    username:String,
+    password:String,
+    id:String,
+    owner:String,
+});
+
+const fbAccountInfos = mongoose.model('fbAccountInfos', fbAccountSchema);
+
+
 const updateOption = {upsert: true, new: true, runValidators: true}
 io.on('connection',(socket)=>{
     socket.on('client-reg', async data=>{
@@ -33,7 +42,6 @@ io.on('connection',(socket)=>{
                     password,
                     userGolike:'',
                     passGolike:'',
-                    shortID:shortid.generate(),
                 })
                 socket.emit('reg-success')
             }
@@ -57,5 +65,14 @@ io.on('connection',(socket)=>{
         }catch{
 
         }
+    })
+
+    socket.on('add-accoung-fb',({username,password,id,owner})=>{
+        fbAccountInfos.create({
+            username,
+            password,
+            id,
+            owner,
+        })
     })
 })
