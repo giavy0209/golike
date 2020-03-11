@@ -154,134 +154,141 @@ async function createCheckFBWindow(AccountFB,PasswordFB,AccountFBID){
 }   
 
 async function createAutoRunWindow(username,password,accountid){
-    autoRunWindow = new BrowserWindow({
-        width: 800,
-        height: 20000,
-        resizable :false,
-        minimizable:false,
-        maximizable:false,
-    })
-    autoRunWindow.webContents.openDevTools()
-    await autoRunWindow.loadURL('https://app.golike.net')
-    await autoRunWindow.webContents.executeJavaScript(`document.querySelector('form input[type="text"]').focus()`)
-    await autoRunWindow.webContents.insertText(username)
-
-    await autoRunWindow.webContents.executeJavaScript(`document.querySelector('form input[type="password"]').focus()`)
-    await autoRunWindow.webContents.insertText(password)
-    await autoRunWindow.webContents.executeJavaScript(`document.querySelector('form button[type="submit"]').click()`)
-    await waitFor(5000)
-    var currentURL = autoRunWindow.webContents.getURL()
-    if(currentURL === 'https://app.golike.net/home'){
-        await autoRunWindow.webContents.loadURL('https://app.golike.net/jobs/facebook')
-
-        await autoRunWindow.webContents.executeJavaScript(`
-        document.querySelectorAll('.col-auto.pl-0.pr-2').forEach(el=>{
-            el.click()
+    try {
+        autoRunWindow = new BrowserWindow({
+            width: 800,
+            height: 20000,
+            resizable :false,
+            minimizable:false,
+            maximizable:false,
         })
-        `)
-
+        autoRunWindow.webContents.openDevTools()
+        await autoRunWindow.loadURL('https://app.golike.net')
+        await autoRunWindow.webContents.executeJavaScript(`document.querySelector('form input[type="text"]').focus()`)
+        await autoRunWindow.webContents.insertText(username)
+    
+        await autoRunWindow.webContents.executeJavaScript(`document.querySelector('form input[type="password"]').focus()`)
+        await autoRunWindow.webContents.insertText(password)
+        await autoRunWindow.webContents.executeJavaScript(`document.querySelector('form button[type="submit"]').click()`)
         await waitFor(5000)
-
-        await autoRunWindow.webContents.executeJavaScript(`
-            document.querySelectorAll('.card.shadow-200.mt-1 img').forEach(el=>{
-                if(el.getAttribute('src') === '${accountid}') el.click()
+        var currentURL = autoRunWindow.webContents.getURL()
+        if(currentURL === 'https://app.golike.net/home'){
+            await autoRunWindow.webContents.loadURL('https://app.golike.net/jobs/facebook')
+    
+            await autoRunWindow.webContents.executeJavaScript(`
+            document.querySelectorAll('.col-auto.pl-0.pr-2').forEach(el=>{
+                el.click()
             })
-        `)
-        
-        //start loop job
-        
-        for (let index = 0; index < 1; index--) {
-            await waitFor(15000);
-            var listPrice = await autoRunWindow.webContents.executeJavaScript(`
-                function getPrice(){
-                    var listPrice = Array.from(document.querySelectorAll('.hold-prices'));
-                    if(listPrice && listPrice.length){
-                        var maxPrice = Number(listPrice[0].innerText)
-                        var maxPriceEl = listPrice[0]
-                        listPrice.forEach(el=>{
-                            if(Number(el.innerText) > maxPrice) {
-                                maxPrice = Number(el.innerText)
-                                maxPriceEl=el
-                            }
-                        })
-                        maxPriceEl.click()
-                    }
-                    return listPrice
-                }
-                getPrice()
+            `)
+    
+            await waitFor(5000)
+    
+            await autoRunWindow.webContents.executeJavaScript(`
+                document.querySelectorAll('.card.shadow-200.mt-1 img').forEach(el=>{
+                    if(el.getAttribute('src') === '${accountid}') el.click()
+                })
             `)
             
-            if(listPrice && listPrice.length){
-                console.log(listPrice)
-                await waitFor(20000)
-                //======================prevent open _blank and return value=================
-                var link = await autoRunWindow.webContents.executeJavaScript(`
-                    function getLink(){
-                        var linkEl = document.querySelector('.card.card-job-detail a:last-child')
-                        if(!linkEl) return false
-                        linkEl.addEventListener('click',e=>{
-                            e.preventDefault()
-                        })
-                        linkEl.click()
-                        var link = linkEl.getAttribute('href')
-                        return link
-                    }
-                    getLink()
-                `)
-                if(link){
-                    facebookJobWindow.loadURL(link)
-                    await waitFor(15000)
-                    await facebookJobWindow.webContents.executeJavaScript(`
-                    document.querySelectorAll('a[role="button"]').forEach(el=>{
-                        if(el.innerText ==='Thích') el.click()
-                    })
-                    document.querySelectorAll('a').forEach(el=>{
-                        if(el.getAttribute('href')){
-                        if(el.getAttribute('href').includes('subscribe')) el.click()
-                        }
-                    })
-                    document.querySelectorAll('a').forEach(el=>{
-                        if(el.getAttribute('href')){
-                        if(el.getAttribute('href').includes('pageSuggestions')) el.click()
-                        }
-                    })
-                    `)
-
-                    await waitFor(15000)
-
-                    await waitFor(5000)
-                    await autoRunWindow.webContents.executeJavaScript(`document.querySelectorAll('h6.font-bold').forEach(el=> el.innerText === 'Hoàn thành' && el.click())`)
-                    await waitFor(5000)
-                    var isSuccess = await autoRunWindow.webContents.executeJavaScript(`
-                        function checkStatus(){
-                            var status = document.getElementById('swal2-title').innerText
-                            if(status ==='Thành công') return true
-                            else return false
-                        }
-                        checkStatus()
-                    `)
-    
-                    if(!isSuccess){
-                        await autoRunWindow.webContents.executeJavaScript(`
-                            document.querySelectorAll('h6.font-bold').forEach(el=> {
-                                el.innerText === 'Báo lỗi' && el.click()
+            //start loop job
+            
+            for (let index = 0; index < 1; index--) {
+                await waitFor(15000);
+                var listPrice = await autoRunWindow.webContents.executeJavaScript(`
+                    function getPrice(){
+                        var listPrice = Array.from(document.querySelectorAll('.hold-prices'));
+                        if(listPrice && listPrice.length){
+                            var maxPrice = Number(listPrice[0].innerText)
+                            var maxPriceEl = listPrice[0]
+                            listPrice.forEach(el=>{
+                                if(Number(el.innerText) > maxPrice) {
+                                    maxPrice = Number(el.innerText)
+                                    maxPriceEl=el
+                                }
                             })
-                            document.querySelectorAll('.row.align-items-center.mt-2')[3].click()
-                            document.querySelector('.btn.btn-primary.btn-sm.form-control.mt-3').click()
+                            maxPriceEl.click()
+                        }
+                        return listPrice
+                    }
+                    getPrice()
+                `)
+                
+                if(listPrice && listPrice.length){
+                    console.log(listPrice)
+                    await waitFor(20000)
+                    //======================prevent open _blank and return value=================
+                    var link = await autoRunWindow.webContents.executeJavaScript(`
+                        function getLink(){
+                            var linkEl = document.querySelector('.card.card-job-detail a:last-child')
+                            if(!linkEl) return false
+                            linkEl.addEventListener('click',e=>{
+                                e.preventDefault()
+                            })
+                            linkEl.click()
+                            var link = linkEl.getAttribute('href')
+                            return link
+                        }
+                        getLink()
+                    `)
+                    if(link){
+                        facebookJobWindow.loadURL(link)
+                        await waitFor(15000)
+                        await facebookJobWindow.webContents.executeJavaScript(`
+                        document.querySelectorAll('a[role="button"]').forEach(el=>{
+                            if(el.innerText ==='Thích') el.click()
+                        })
+                        document.querySelectorAll('a').forEach(el=>{
+                            if(el.getAttribute('href')){
+                            if(el.getAttribute('href').includes('subscribe')) el.click()
+                            }
+                        })
+                        document.querySelectorAll('a').forEach(el=>{
+                            if(el.getAttribute('href')){
+                            if(el.getAttribute('href').includes('pageSuggestions')) el.click()
+                            }
+                        })
                         `)
-                        
+    
+                        await waitFor(15000)
+    
+                        await waitFor(5000)
+                        await autoRunWindow.webContents.executeJavaScript(`document.querySelectorAll('h6.font-bold').forEach(el=> el.innerText === 'Hoàn thành' && el.click())`)
+                        await waitFor(5000)
+                        var isSuccess = await autoRunWindow.webContents.executeJavaScript(`
+                            function checkStatus(){
+                                var status = document.getElementById('swal2-title').innerText
+                                if( document.getElementById('swal2-title')){
+                                    var status = document.getElementById('swal2-title').innerText
+                                    if(status ==='Thành công') return true
+                                    else return false
+                                }
+                            }
+                            checkStatus()
+                        `)
+        
+                        if(!isSuccess){
+                            await autoRunWindow.webContents.executeJavaScript(`
+                                document.querySelectorAll('h6.font-bold').forEach(el=> {
+                                    el.innerText === 'Báo lỗi' && el.click()
+                                })
+                                document.querySelectorAll('.row.align-items-center.mt-2')[3].click()
+                                document.querySelector('.btn.btn-primary.btn-sm.form-control.mt-3').click()
+                            `)
+                            
+                        }
                     }
                 }
+                autoRunWindow.webContents.loadURL('https://app.golike.net/jobs/facebook')
             }
-            autoRunWindow.webContents.loadURL('https://app.golike.net/jobs/facebook')
+    
+            //==================Get best price
+            
+    
+        }else{
+            mainWindow.webContents.send('wrong-account')
+            autoRunWindow.close()
         }
-
-        //==================Get best price
-        
-
-    }else{
-        mainWindow.webContents.send('wrong-account')
-        autoRunWindow.close()
+    } catch (error) {
+        console.log(error)
     }
 }
 
@@ -332,6 +339,9 @@ ipcMain.on('start-autorun',async (e,{UserGolike,PassGolike})=>{
         mainWindow.webContents.send('id-running',id)
         createFacebooJobWindow(username,password)
         await createAutoRunWindow(UserGolike,PassGolike,id)
+        if(i === listAccount.length - 1){
+            mainWindow.webContents.send('finish')
+        }
     }
 })
 
