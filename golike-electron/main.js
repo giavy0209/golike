@@ -13,7 +13,7 @@ async function loopJob( callback) {
 }
 
 function randomTime(){
-    var time = (Math.random()*15 + 15)*1000
+    var time = (Math.random()*60 + 60)*1000
     return time
 }
 
@@ -162,7 +162,7 @@ async function createCheckFBWindow(AccountFB,PasswordFB,AccountFBID,UserGolike){
     checkFBWindow.close()
 }   
 
-async function createAutoRunWindow(username,password,accountid){
+async function createAutoRunWindow(username,password,accountid,AccountFB,PasswordFB){
     try {
         autoRunWindow = new BrowserWindow({
             width: 800,
@@ -201,10 +201,29 @@ async function createAutoRunWindow(username,password,accountid){
             
             for (let index = 0; index < 1; index--) {
                 autoRunWindow.webContents.loadURL('https://app.golike.net/jobs/facebook')
-                await waitFor(randomTime());
-                await autoRunWindow.webContents.executeJavaScript(`
-                    document.querySelectorAll('.material-icons.bg-gradient-1').forEach(el=>{if(el.innerText == 'refresh'){el.click()}})
+
+                await waitFor(randomTime)
+
+                var isErorr = await autoRunWindow.webContents.executeJavaScript(`
+                    function CheckErorr(){
+                        if(document.getElementById('swal2-title')){
+                            if(document.getElementById('swal2-title').innerText){
+                                if(document.getElementById('swal2-title').innerText == "Lỗi") return true
+                            }
+                        }
+                        return false
+                    }
+                    CheckErorr()
                 `)
+                if(isErorr){
+                    autoRunWindow.close()
+                    facebookJobWindow.close()
+                    break
+                }
+                // await waitFor(randomTime());
+                // await autoRunWindow.webContents.executeJavaScript(`
+                //     document.querySelectorAll('.material-icons.bg-gradient-1').forEach(el=>{if(el.innerText == 'refresh'){el.click()}})
+                // `)
                 await waitFor(randomTime())
                 var listPrice = await autoRunWindow.webContents.executeJavaScript(`
                     function getPrice(){
@@ -267,9 +286,16 @@ async function createAutoRunWindow(username,password,accountid){
 
                         var isLogouted = await facebookJobWindow.webContents.executeJavaScript(`
                             function checkLogout(){
-                                if(document.querySelectorAll('div > a > span')){
-                                    if(document.querySelectorAll('div > a > span').innerText){
-                                        return true
+                                if(document.title ===  'Kiểm tra Bảo mật'){
+                                    return false
+                                }
+                                if(document.querySelector('div > a > span')){
+                                    if(document.querySelector('div > a > span').innerText){
+                                        if(document.querySelector('div > a > span').innerText == "Tham gia" || document.querySelector('div > a > span').innerText == "Không phải bạn"){
+                                            return true
+                                        }else{
+                                            return false
+                                        }
                                     }else return false
                                 }else return false
                             }
@@ -279,7 +305,7 @@ async function createAutoRunWindow(username,password,accountid){
                         if(!isLogouted){
                             await facebookJobWindow.webContents.executeJavaScript(`
                             document.querySelectorAll('a[role="button"]').forEach(el=>{
-                                if(el.innerText ==='Thích') el.click()
+                                if(el.innerText && el.innerText ==='Thích') el.click()
                             })
                             document.querySelectorAll('a').forEach(el=>{
                                 if(el.getAttribute('href')){
@@ -326,14 +352,13 @@ async function createAutoRunWindow(username,password,accountid){
                                 
                             }
                         }else{
-                            facebookJobWindow.webContents.session.clearStorageData()
-                            facebookJobWindow.loadURL('https://m.facebook.com')
-                            facebookJobWindow.webContents.openDevTools()
-                            await facebookJobWindow.webContents.executeJavaScript(`
-                                document.getElementById('m_login_email').value = '${AccountFB}'
-                                document.getElementById('m_login_password').value = '${PasswordFB}'
-                                document.querySelector('form button').click()
-                            `)
+                            facebookJobWindow.close()
+                            facebookJobWindow = null;
+                            createFacebooJobWindow(AccountFB,PasswordFB)
+                            autoRunWindow.close()
+                            autoRunWindow = null;
+                            await createAutoRunWindow(username,password,accountid,AccountFB,PasswordFB)
+                            break
                         }
 
                     }
@@ -398,9 +423,9 @@ ipcMain.on('start-autorun',async (e,{UserGolike,PassGolike})=>{
         var {username,password,id} = listAccount[i]
         mainWindow.webContents.send('id-running',id)
         createFacebooJobWindow(username,password)
-        await createAutoRunWindow(UserGolike,PassGolike,id)
+        await createAutoRunWindow(UserGolike,PassGolike,id,username,password)
         if(i === listAccount.length - 1){
-            mainWindow.webContents.send('finish')
+            i = 0;
         }
     }
 })
