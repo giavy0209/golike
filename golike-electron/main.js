@@ -264,46 +264,69 @@ async function createAutoRunWindow(username,password,accountid){
                     if(link){
                         facebookJobWindow.loadURL(link)
                         await waitFor(randomTime())
-                        await facebookJobWindow.webContents.executeJavaScript(`
-                        document.querySelectorAll('a[role="button"]').forEach(el=>{
-                            if(el.innerText ==='Thích') el.click()
-                        })
-                        document.querySelectorAll('a').forEach(el=>{
-                            if(el.getAttribute('href')){
-                            if(el.getAttribute('href').includes('subscribe')) el.click()
+
+                        var isLogouted = await facebookJobWindow.executeJavaScript(`
+                            function checkLogout(){
+                                if(document.querySelectorAll('div > a > span')){
+                                    if(document.querySelectorAll('div > a > span').innerText){
+                                        return true
+                                    }else return false
+                                }else return false
                             }
-                        })
-                        document.querySelectorAll('a').forEach(el=>{
-                            if(el.getAttribute('href')){
-                            if(el.getAttribute('href').includes('pageSuggestions')) el.click()
-                            }
-                        })
+                            checkLogout()
                         `)
-    
-                        await waitFor(randomTime())
-                        await autoRunWindow.webContents.executeJavaScript(`document.querySelectorAll('h6.font-bold').forEach(el=> el.innerText === 'Hoàn thành' && el.click())`)
-                        await waitFor(randomTime())
-                        var isSuccess = await autoRunWindow.webContents.executeJavaScript(`
-                            function checkStatus(){
-                                if( document.getElementById('swal2-title')){
-                                    var status = document.getElementById('swal2-title').innerText
-                                    if(status ==='Thành công') return true
-                                    else return false
+                        
+                        if(!isLogouted){
+                            await facebookJobWindow.webContents.executeJavaScript(`
+                            document.querySelectorAll('a[role="button"]').forEach(el=>{
+                                if(el.innerText ==='Thích') el.click()
+                            })
+                            document.querySelectorAll('a').forEach(el=>{
+                                if(el.getAttribute('href')){
+                                if(el.getAttribute('href').includes('subscribe')) el.click()
                                 }
-                            }
-                            checkStatus()
-                        `)
-        
-                        if(!isSuccess){
-                            await autoRunWindow.webContents.executeJavaScript(`
-                                document.querySelectorAll('h6.font-bold').forEach(el=> {
-                                    el.innerText === 'Báo lỗi' && el.click()
-                                })
-                                document.querySelectorAll('.row.align-items-center.mt-2')[3].click()
-                                document.querySelector('.btn.btn-primary.btn-sm.form-control.mt-3').click()
+                            })
+                            document.querySelectorAll('a').forEach(el=>{
+                                if(el.getAttribute('href')){
+                                if(el.getAttribute('href').includes('pageSuggestions')) el.click()
+                                }
+                            })
                             `)
-                            
+        
+                            await waitFor(randomTime())
+                            await autoRunWindow.webContents.executeJavaScript(`document.querySelectorAll('h6.font-bold').forEach(el=> el.innerText === 'Hoàn thành' && el.click())`)
+                            await waitFor(randomTime())
+                            var isSuccess = await autoRunWindow.webContents.executeJavaScript(`
+                                function checkStatus(){
+                                    if( document.getElementById('swal2-title')){
+                                        var status = document.getElementById('swal2-title').innerText
+                                        if(status ==='Thành công') return true
+                                        else return false
+                                    }
+                                }
+                                checkStatus()
+                            `)
+            
+                            if(!isSuccess){
+                                await autoRunWindow.webContents.executeJavaScript(`
+                                    document.querySelectorAll('h6.font-bold').forEach(el=> {
+                                        el.innerText === 'Báo lỗi' && el.click()
+                                    })
+                                    document.querySelectorAll('.row.align-items-center.mt-2')[3].click()
+                                    document.querySelector('.btn.btn-primary.btn-sm.form-control.mt-3').click()
+                                `)
+                                
+                            }
+                        }else{
+                            facebookJobWindow.loadURL('https://m.facebook.com')
+                            facebookJobWindow.webContents.openDevTools()
+                            await facebookJobWindow.webContents.executeJavaScript(`
+                                document.getElementById('m_login_email').value = '${AccountFB}'
+                                document.getElementById('m_login_password').value = '${PasswordFB}'
+                                document.querySelector('form button').click()
+                            `)
                         }
+
                     }
                 }
             }
