@@ -13,7 +13,7 @@ async function loopJob( callback) {
 }
 
 function randomTime(){
-    var time = (Math.random()*30 + 30)*1000
+    var time = (Math.random()*15 + 15)*1000
     return time
 }
 
@@ -197,10 +197,10 @@ async function createAutoRunWindow(username,password,accountid){
                     if(el.getAttribute('src') === '${accountid}') el.click()
                 })
             `)
-            
             //start loop job
             
             for (let index = 0; index < 1; index--) {
+                autoRunWindow.webContents.loadURL('https://app.golike.net/jobs/facebook')
                 await waitFor(randomTime());
                 await autoRunWindow.webContents.executeJavaScript(`
                     document.querySelectorAll('.material-icons.bg-gradient-1').forEach(el=>{if(el.innerText == 'refresh'){el.click()}})
@@ -210,10 +210,15 @@ async function createAutoRunWindow(username,password,accountid){
                     function getPrice(){
                         var like  = document.querySelectorAll('.card.mb-2 .card-body img[src="../../assets/images/icons-gif/like.gif"]');
                         var follow = document.querySelectorAll('.card.mb-2 .card-body img[src="../../assets/images/icons-gif/follow.svg"]');
+                        var likePage = document.querySelectorAll('.card.mb-2 .card-body img[src="../../assets/images/icons-gif/like_page.gif"]');
 
-                        if(like.length > 0 || follow.length > 0){
+                        if(like.length > 0 || follow.length > 0 || likePage.length > 0){
                             var listAvaiablePrice = [];
                             like.forEach(el=>{
+                                el.nextElementSibling.firstChild.firstChild
+                                listAvaiablePrice.push(el.nextElementSibling.firstChild.firstChild)
+                            })
+                            likePage.forEach(el=>{
                                 el.nextElementSibling.firstChild.firstChild
                                 listAvaiablePrice.push(el.nextElementSibling.firstChild.firstChild)
                             })
@@ -301,7 +306,6 @@ async function createAutoRunWindow(username,password,accountid){
                         }
                     }
                 }
-                autoRunWindow.webContents.loadURL('https://app.golike.net/jobs/facebook')
             }
     
             //==================Get best price
