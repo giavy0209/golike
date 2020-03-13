@@ -25,7 +25,7 @@ const storage = require('electron-json-storage');
 
 const isDev = process.env.NODE_ENV == 'dev'
 const socketDomain = 'http://localhost:3001';
-const siteDomain = isDev ? 'http://localhost:3000' : 'https://google.com';
+const siteDomain = isDev ? 'http://localhost:3000' : 'https://ftp.autogolike.com';
 
 const socket = io(socketDomain)
 
@@ -65,7 +65,6 @@ async function createSubWindow(username, password){
         height: 20000,
         resizable :false,
         minimizable:false,
-        maximizable:false,
     })
     subWindow.webContents.session.clearStorageData()
     subWindow.loadURL('https://app.golike.net')
@@ -115,7 +114,6 @@ async function createCheckFBWindow(AccountFB,PasswordFB,AccountFBID,UserGolike){
         height: 20000,
         resizable :false,
         minimizable:false,
-        maximizable:false,
     })
     checkFBWindow.webContents.session.clearStorageData()
     checkFBWindow.loadURL('https://m.facebook.com')
@@ -171,7 +169,14 @@ async function createAutoRunWindow(username,password,accountid,AccountFB,Passwor
             minimizable:false,
             maximizable:false,
         })
-        autoRunWindow.webContents.openDevTools()
+        autoRunWindow.on('close',()=> {
+            if(facebookJobWindow){
+                facebookJobWindow.close()
+                facebookJobWindow = null
+            }
+            autoRunWindow = null
+        })
+        isDev && autoRunWindow.webContents.openDevTools()
         await autoRunWindow.loadURL('https://app.golike.net')
         await autoRunWindow.webContents.executeJavaScript(`document.querySelector('form input[type="text"]').focus()`)
         await autoRunWindow.webContents.insertText(username)
@@ -372,6 +377,7 @@ async function createAutoRunWindow(username,password,accountid,AccountFB,Passwor
             mainWindow.webContents.send('wrong-account')
             autoRunWindow.close()
         }
+        
     } catch (error) {
         console.log(error)
     }
@@ -379,15 +385,21 @@ async function createAutoRunWindow(username,password,accountid,AccountFB,Passwor
 
 async function createFacebooJobWindow(AccountFB,PasswordFB){
     facebookJobWindow = new BrowserWindow({
-        width: 800,
-        height: 20000,
+        width: 400,
+        height: 400,
         resizable :false,
         minimizable:false,
-        maximizable:false,
+    })
+    facebookJobWindow.on('close',()=> {
+        if(autoRunWindow){
+            autoRunWindow.close()
+            autoRunWindow = null
+        }
+        facebookJobWindow = null
     })
     facebookJobWindow.webContents.session.clearStorageData()
     facebookJobWindow.loadURL('https://m.facebook.com')
-    facebookJobWindow.webContents.openDevTools()
+    isDev && facebookJobWindow.webContents.openDevTools()
     await facebookJobWindow.webContents.executeJavaScript(`
         document.getElementById('m_login_email').value = '${AccountFB}'
         document.getElementById('m_login_password').value = '${PasswordFB}'
@@ -428,6 +440,14 @@ ipcMain.on('start-autorun',async (e,{UserGolike,PassGolike})=>{
             i = 0;
         }
     }
+})
+
+ipcMain.on('delete-facebook',(e,id)=>{
+    var data = JSON.parse(fs.readFileSync(path.join(__dirname,'./account.json')))
+    var idx = data.findIndex(o=>o.id == id)
+    data.splice(idx,1)
+    fs.writeFileSync(path.join(__dirname,'./account.json'), JSON.stringify(data))
+    mainWindow.webContents.send('deleted-facebook',data)
 })
 
 ipcMain.on('stop',()=>{

@@ -72,6 +72,7 @@ function App() {
       <EarnMoney
       className={FooterTab==='earnmoney'? 'dp-b' : 'dp-n'}
       GlobalListAccoutHas={GlobalListAccoutHas}
+      setGlobalListAccoutHas={setGlobalListAccoutHas}
       ipcRenderer={ipcRenderer}
       UserGolike={UserGolike}
       PassGolike={PassGolike}

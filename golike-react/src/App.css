@@ -511,5 +511,18 @@ footer .active {
       vertical-align: top; }
     .list-account-added .account-added + .account-added {
       margin-top: 20px; }
-
+.account-added{
+  position: relative;
+}
+.account-added .delete{
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  cursor: pointer;
+  color: #fff;
+  background-color: #ff0000;
+  border: none;
+  width: fit-content;
+  padding: 5px;
+}
 /*# sourceMappingURL=App.css.map */
