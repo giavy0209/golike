@@ -265,7 +265,7 @@ async function createAutoRunWindow(username,password,accountid){
                         facebookJobWindow.loadURL(link)
                         await waitFor(randomTime())
 
-                        var isLogouted = await facebookJobWindow.executeJavaScript(`
+                        var isLogouted = await facebookJobWindow.webContents.executeJavaScript(`
                             function checkLogout(){
                                 if(document.querySelectorAll('div > a > span')){
                                     if(document.querySelectorAll('div > a > span').innerText){
@@ -309,15 +309,24 @@ async function createAutoRunWindow(username,password,accountid){
             
                             if(!isSuccess){
                                 await autoRunWindow.webContents.executeJavaScript(`
+                                if(document.querySelectorAll('h6.font-bold')){
                                     document.querySelectorAll('h6.font-bold').forEach(el=> {
-                                        el.innerText === 'Báo lỗi' && el.click()
+                                        if(el.innerText && el.innerText === 'Báo lỗi'){
+                                            el.click()  
+                                            if(document.querySelectorAll('.row.align-items-center.mt-2')[3]){
+                                                document.querySelectorAll('.row.align-items-center.mt-2')[3].click()
+                                                if(document.querySelector('.btn.btn-primary.btn-sm.form-control.mt-3')){
+                                                    document.querySelector('.btn.btn-primary.btn-sm.form-control.mt-3').click()
+                                                }
+                                            }
+                                        } 
                                     })
-                                    document.querySelectorAll('.row.align-items-center.mt-2')[3].click()
-                                    document.querySelector('.btn.btn-primary.btn-sm.form-control.mt-3').click()
+                                }
                                 `)
                                 
                             }
                         }else{
+                            facebookJobWindow.webContents.session.clearStorageData()
                             facebookJobWindow.loadURL('https://m.facebook.com')
                             facebookJobWindow.webContents.openDevTools()
                             await facebookJobWindow.webContents.executeJavaScript(`
