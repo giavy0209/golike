@@ -58,7 +58,7 @@ export default function Autorun({className,ipcRenderer,UserGolike,PassGolike,set
                                 <span>{account.name}</span>
                                 {
                                     ListAccountHas.map(accountHas=>{
-                                        if(accountHas.id === account.avata)  return (<span style={{fontSize:12}}>TKFB: {accountHas.username} | PassFB: {accountHas.password} </span>) 
+                                        if(accountHas.id === account.avata)  return (<span style={{fontSize:12}}>TKFB: {accountHas.username}</span>) 
                                         return null
                                     })
                                 }

@@ -62,7 +62,7 @@ export default function EarnMoney({GlobalListAccoutHas,className,ipcRenderer,Use
                             <div key={account.id} className="account-added">
                                 <img src={account.id} alt=""/>
                                 <span>
-                                    <span>TKFB: {account.username} | PasswordFB: {account.password} </span>
+                                    <span>TKFB: {account.username}</span>
                                     {
                                         IsRunning && IDRunning === account.id && <p style={{fontSize:14, color: '#00ff00'}}> Đang chạy </p>
                                     }

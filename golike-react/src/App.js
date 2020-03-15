@@ -1,4 +1,4 @@
-import React,{useState,useCallback,} from 'react';
+import React,{useState,useCallback, useEffect,} from 'react';
 import './App.css';
 import io from 'socket.io-client'
 
@@ -9,6 +9,9 @@ import Footer from './components/Footer'
 import Account from './components/Account';
 import EarnMoney from './components/EarnMoney';
 
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+
 const electron = window.require('electron')
 const {ipcRenderer} = electron;
 const connectionConfig = {
@@ -17,7 +20,7 @@ const connectionConfig = {
   reconnectionDelay: 100,
   reconnectionAttempts: 100000
 };
-const socket = io('http://localhost:3001',connectionConfig)
+const socket = io('https://autogolike.com',connectionConfig)
 
 function App() {
   const [DisplayLoading, setDisplayLoading] = useState(0);
@@ -40,6 +43,22 @@ function App() {
   const changeTab = useCallback((tabName)=>{
     setFooterTab(tabName)
     console.log(tabName)
+  },[])
+
+  useEffect(()=>{
+    ipcRenderer.on('not-enought-file',()=>{
+      confirmAlert({
+        message: 'Có vẻ chương trình diệt virus nào đó đã ăn mất vài file cần thiết. Bạn vui lòng tắt diệt virus và mở lại app nhé',
+        buttons: [
+          {
+            label: 'OK',
+            onClick: () => {
+                ipcRenderer.send('quit',)
+            }
+          }
+        ]
+      });
+    })
   },[])
   return (
     <>

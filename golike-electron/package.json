@@ -22,6 +22,12 @@
     "appId": "com.autogolike.app",
     "win": {
       "icon": "./icon.png"
-    }
+    },
+    "extraResources": [
+      {
+        "from": "./account/",
+        "to": "./"
+      }
+    ]
   }
 }

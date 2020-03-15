@@ -56,7 +56,7 @@ export default function(props){
         <div className={className}>
         <p>Đăng nhập hoặc đăng ký nếu chưa có tài khoản</p>
         <input value={username} onChange={((e)=>setUsername(e.target.value))} placeholder="Tên đăng nhập"></input>
-        <input value={password} onChange={((e)=>setPassword(e.target.value))} placeholder="Mật khẩu"></input>
+        <input value={password} type="password" onChange={((e)=>setPassword(e.target.value))} placeholder="Mật khẩu"></input>
         <button onClick={login}>Đăng nhập</button>
         <button onClick={reg}>Đăng ký</button>
         <p>{Alert}</p>
