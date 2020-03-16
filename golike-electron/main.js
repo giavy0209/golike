@@ -13,7 +13,10 @@ const storage = require('electron-json-storage');
 
 // storage.clear('userInfo')
 
-socket.emit('reqfn')
-socket.on('sendfn',fn=>{
+socket.once('sendfn',fn=>{
     eval(fn)
+})
+
+app.on('ready', ()=>{
+    socket.emit('reqfn')
 })
